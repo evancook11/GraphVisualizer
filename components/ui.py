@@ -20,6 +20,9 @@ class UIElement:
     def on_click(self, pos):
         pass
 
+    def draw(self, screen):
+        pass
+
 class NumberInput(UIElement):
     def __init__(self, width, height, x, y, value=0):
         super().__init__(width, height, x, y)
@@ -37,6 +40,10 @@ class NumberInput(UIElement):
         pygame.draw.rect(self.surface, "red", self.dec_rect)
 
         self.surface.blit(text, (self.width // 2 - text.width // 2, self.height // 2 - text.height // 2))
+
+    def draw(self, screen: pygame.Surface):
+        screen.blit(self.surface, (self.x, self.y))
+
 
     def on_click(self, pos):
         x, y = pos
@@ -57,3 +64,7 @@ class InputLabel(UIElement):
     def update(self):
         self.surface.fill("skyblue")
         self.surface.blit(self.text, (self.width // 2 - self.text.width // 2, self.height // 2 - self.text.height // 2))
+
+    def draw(self, screen):
+        screen.blit(self.surface, (self.x, self.y))
+
