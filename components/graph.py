@@ -39,7 +39,7 @@ class Graph:
                     self.vertices.remove(vertex)
                     break
         for edge in self.edges:
-            if edge[0] == deleted_vertex or edge[1] == deleted_vertex:
+            if deleted_vertex in edge:
                 self.edges.remove(edge)
         self.num_vertices -= 1
         self.labels.remove(deleted_vertex.label)

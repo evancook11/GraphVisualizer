@@ -135,6 +135,10 @@ class ManageEdges(State):
         self.selected_vertex = persistent['selected_vertex']
         self.ui_elements = []
         self.ui_elements.append(ui.InputLabel(200, 50, 900, 150, "Select a vertex"))
+        self.ui_elements.append(ui.Button(50, 50, 975, 250, self.cancel, "X", color="red", text_color="white"))
+
+    def cancel(self):
+        self.done = True
 
     def get_event(self, event: pygame.event.Event):
         super().get_event(event)
@@ -149,3 +153,4 @@ class ManageEdges(State):
                     else:
                         self.graph.remove_edge(self.selected_vertex, vertex)
                     self.done = True
+

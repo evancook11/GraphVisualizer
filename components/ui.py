@@ -73,13 +73,15 @@ class InputLabel(UIElement):
         screen.blit(self.surface, (self.x, self.y))
 
 class Button(UIElement):
-    def __init__(self, width, height, x, y, callback=None, text="", font=DEFAULT_FONT):
+    def __init__(self, width, height, x, y, callback=None, text="", font=DEFAULT_FONT, color="white", text_color="black"):
         super().__init__(width, height, x, y)
         self.callback = callback
-        self.text = font.render(text, True, "black")
+        self.text_color = text_color
+        self.text = font.render(text, True, text_color)
+        self.color = color
 
     def update(self):
-        self.surface.fill("white")
+        self.surface.fill(self.color)
         self.surface.blit(self.text, (self.width // 2 - self.text.width // 2, self.height // 2 - self.text.height // 2))
 
     def draw(self, screen):
