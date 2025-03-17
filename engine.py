@@ -29,7 +29,6 @@ class Engine:
             if self.state.next_state:
                 prev_state = self.state_name
                 persistent = self.state.persist
-                print(persistent)
                 self.state_name = self.state.next_state
                 self.state = self.states[self.state_name]
                 self.state.startup(persistent)

@@ -75,6 +75,7 @@ class DefaultState(State):
 
     def vertex_selected(self, vertex: Vertex):
         self.persist['selected_vertex'] = vertex
+        self.persist['dragging'] = True
         self.change_state("VERTEX_SELECTED")
 
 
@@ -83,6 +84,8 @@ class VertexSelected(State):
         super().__init__()
         self.selected_vertex = None
         self.selected_vertex_label = None
+        self.dragging = False
+        self.dragging_offset = [0, 0]
 
     def startup(self, persistent: dict[str]):
         super().startup(persistent)
@@ -93,6 +96,11 @@ class VertexSelected(State):
         self.ui_elements.append(ui.Button(200, 50, 900, 200, self.add_edge, "Add Edge"))
         self.ui_elements.append(ui.Button(200, 50, 900, 300, self.delete_edge, "Remove Edge"))
         self.ui_elements.append(ui.Button(200, 50, 900, 400, self.delete_vertex, "Remove Vertex"))
+        # dragging will be false each time unless the previous state sets it to True
+        self.dragging = persistent.get('dragging', False)
+        self.persist['dragging'] = False
+        x, y = pygame.mouse.get_pos()
+        self.dragging_offset = [x - self.selected_vertex.x, y - self.selected_vertex.y]
 
     def add_edge(self):
         self.persist['manage_edges_mode'] = "add"
@@ -116,11 +124,38 @@ class VertexSelected(State):
                 x, y = mouse_pos
                 vertex = self.graph.check_vertex_collision(x, y)
                 if vertex:
+                    self.dragging = True
                     self.selected_vertex = vertex
                     self.selected_vertex_label.value = "Selected vertex: " +  str(self.selected_vertex.label)
+                    self.dragging_offset = [x - self.selected_vertex.x, y - self.selected_vertex.y]
                 elif self.graph.rect.collidepoint(mouse_pos):
                     self.done = True
+        if event.type == pygame.MOUSEBUTTONUP:
+            if event.button == 1:
+                self.dragging = False
 
+
+    def update(self):
+        super().update()
+        if self.dragging:
+            self.move_selected_vertex()
+
+    def draw(self, screen: pygame.Surface):
+        super().draw(screen)
+        x = self.graph.x + self.selected_vertex.x
+        y = self.graph.y + self.selected_vertex.y
+        border_width = 2
+        pygame.draw.circle(screen, 'green', (x, y), self.selected_vertex.radius + border_width, border_width)
+
+
+    def move_selected_vertex(self):
+        x, y = pygame.mouse.get_pos()
+        x -= self.dragging_offset[0]
+        y -= self.dragging_offset[1]
+        self.selected_vertex.x = x
+        self.selected_vertex.y = y
+
+            
 
 
 class ManageEdges(State):
@@ -154,3 +189,9 @@ class ManageEdges(State):
                         self.graph.remove_edge(self.selected_vertex, vertex)
                     self.done = True
 
+    def draw(self, screen: pygame.Surface):
+        super().draw(screen)
+        x = self.graph.x + self.selected_vertex.x
+        y = self.graph.y + self.selected_vertex.y
+        border_width = 2
+        pygame.draw.circle(screen, 'green', (x, y), self.selected_vertex.radius + border_width, border_width)
